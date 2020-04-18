@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  test function for debug test
+Parameters:
+  OwnerTag:
+    Type: String
+    Default: jrusso
+  ProjectTag:
+    Type: String
+    Default: Sandbox
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Runtime: python3.8
+    Timeout: 300
+    MemorySize: 128
+
+Resources:
+  # Lambda - test function
+  Function1:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: function1/
+      Handler: app.lambda_handler
+      Role: !GetAtt LambdaAppRole.Arn
+      Layers:
+        - !Ref SharedLayer1
+      Events:
+          ApiEvent:
+            Type: Api
+            Properties:
+              Method: Get
+              Path: /func1
+              RestApiId: 
+                Ref: FuncAPI
+      Tags:
+        Owner: !Ref OwnerTag
+        Project: !Ref ProjectTag
+        
+  # Lambda layer - shared functionality
+  SharedLayer1:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: resource-management-dependencies
+      Description: "Depencies and shared libraries for resource management"
+      ContentUri: shared_layer1/
+      CompatibleRuntimes:
+        - python3.8
+      LicenseInfo: "MIT"
+      RetentionPolicy: Delete
+      
+  # API
+  FuncAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Cors:
+        AllowMethods: "'OPTIONS,GET'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'"
+      StageName: Test
+      Tags:
+        Owner: !Ref OwnerTag
+        Project: !Ref ProjectTag
+
+  LambdaAppRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument: 
+          Version: "2012-10-17"
+          Statement:
+            - Action: 
+              - "sts:AssumeRole"
+              Effect: "Allow"
+              Principal:
+                Service:
+                    - "lambda.amazonaws.com" 
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole # provides write permissions to cloudwatch logs
+      Path: "/service-role/"
+      Description: String
+      Tags:
+        - 
+          Key: Owner 
+          Value: !Ref OwnerTag
+        - 
+          Key: Project
+          Value: !Ref ProjectTag
