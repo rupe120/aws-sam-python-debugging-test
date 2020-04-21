@@ -187,7 +187,7 @@ celerybeat-schedule.*
 *.sage.py
 
 # Environments
-.env
+#.env # we want this so that the folder for the layer is always added to the PYTHONPATH
 .venv
 env/
 venv/
