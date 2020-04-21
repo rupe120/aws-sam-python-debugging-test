@@ -1,7 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  test function for debug test
+Description: test function for debug test
 Parameters:
   OwnerTag:
     Type: String
@@ -10,6 +9,7 @@ Parameters:
     Type: String
     Default: Sandbox
 
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -17,9 +17,9 @@ Globals:
     Timeout: 300
     MemorySize: 128
 
+
 Resources:
-  # Lambda - test function1
-  Function1:
+  Function1: # Lambda - test function1
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: function1/
@@ -33,8 +33,6 @@ Resources:
             Properties:
               Method: Get
               Path: /func1
-              RestApiId: 
-                Ref: FuncAPI
       Tags:
         Owner: !Ref OwnerTag
         Project: !Ref ProjectTag
@@ -51,19 +49,6 @@ Resources:
       LicenseInfo: "MIT"
       RetentionPolicy: Delete
       
-  # API
-  FuncAPI:
-    Type: AWS::Serverless::Api
-    Properties:
-      Cors:
-        AllowMethods: "'OPTIONS,GET'"
-        AllowHeaders: "'Content-Type'"
-        AllowOrigin: "'*'"
-      StageName: Test
-      Tags:
-        Owner: !Ref OwnerTag
-        Project: !Ref ProjectTag
-
   LambdaAppRole:
     Type: AWS::IAM::Role
     Properties: 
